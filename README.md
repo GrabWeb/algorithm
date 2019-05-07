@@ -1,2 +1,2 @@
-# algorithm
+# resume
 exercise
