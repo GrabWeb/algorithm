@@ -36,7 +36,12 @@
             'z': 'zhihu.com', 
             'm': 'www.mcdonalds.com.cn'
          }
-
+         //取出 localStorage 中的 zzz 对应的 hash
+         var hashInLocalStorage = JSON.parse(localStorage.getItem('zzz') || 'null')
+         if(hashInLocalStorage){
+             hash = hashInLocalStorage //保证hash优先取之前用户设置的
+         } 
+         //遍历key，生成kbd标签
          index = 0
          while(index < keys['length']){
              div1 = document.createElement('div')
@@ -49,6 +54,14 @@
                 kbdxxx.textContent = row[index2]
                 buttonxxx = document.createElement('button')
                 kbdxxx.appendChild(buttonxxx)
+                buttonxxx.id = row[index2]
+                buttonxxx.onclick = function(event){
+                    key = event.target.id   //被用户点击的那个按钮   
+                    x = prompt('给我一个网址') 
+                    hash[key] = x  //hash变更,使变更属性消失
+                    localStorage.setItem('zzz', JSON.stringify(hash))//使用localStorage储存，解决属性消失问题
+                    console.log(hash)
+                }
                 buttonxxx.textContent = '编辑'
                 div1.appendChild(kbdxxx)
                 index2 = index2 + 1
