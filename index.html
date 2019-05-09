@@ -8,12 +8,13 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <header></header>
+    <header></header> 
     <main>
-        <div class = "wrapper" id = "mainxxx"></div>
+        <div class = "wrapper" id = "main"></div>
     </main>
     <footer></footer>
     <script>
+        // 1. 初始化数据
          var keys = {
             '0': {0:'q',1:'w',2:'e',3:'r',4:'t',5:'y',6:'u',7:'i',8:'o',9:'p',length:10},
 			'1': {0:'a',1:'s',2:'d',3:'f',4:'g',5:'h',6:'j',7:'k',8:'l',length:9},
@@ -37,33 +38,71 @@
             'm': 'www.mcdonalds.com.cn'
          }
          //取出 localStorage 中的 zzz 对应的 hash
-         var hashInLocalStorage = JSON.parse(localStorage.getItem('zzz') || 'null')
+         var hashInLocalStorage = getFromLocaStorage('zzz')
          if(hashInLocalStorage){
              hash = hashInLocalStorage //保证hash优先取之前用户设置的
          } 
-         //遍历key，生成kbd标签
-         index = 0
-         while(index < keys['length']){
-             div1 = document.createElement('div')
-             mainxxx.appendChild(div1)
-             row = keys[index] //第一个数组 第二个数组 第三个数组
+         
+         function tag(tagName){
+             return document.createElement(tagName);
+         }
 
-             index2 = 0
+         // 2. 生成键盘
+         //遍历key，生成kbd标签
+         var index = 0
+         while(index < keys['length']){
+             var div = tag('div')
+             main.appendChild(div)
+             div.className = 'row' //增加'row'属性名
+             var row = keys[index] //第一个数组 第二个数组 第三个数组
+
+             var index2 = 0
              while(index2 < row['length']){
-                kbdxxx = document.createElement('kbd')
-                kbdxxx.textContent = row[index2]
-                buttonxxx = document.createElement('button')
-                kbdxxx.appendChild(buttonxxx)
-                buttonxxx.id = row[index2]
-                buttonxxx.onclick = function(event){
-                    key = event.target.id   //被用户点击的那个按钮   
-                    x = prompt('给我一个网址') 
-                    hash[key] = x  //hash变更,使变更属性消失
+                var kbd = tag('kbd')
+                var span = tag('span')
+
+                span.textContent = row[index2]
+                kbd.appendChild(span)
+                span.className = 'text'
+
+                kbd.className = 'key' //增加 'key' 属性名
+                var button = tag('button')
+                kbd.appendChild(button)
+                button.id = row[index2]
+                var img = tag('img')
+                //img.src = 'http://' + hash[row[index2]] + '/favicon.ico';
+                //判断按键是否为null，是的话加入另一统一图标
+                if (hash[row[index2]]){
+                    img.src = 'http://' + hash[row[index2]] + '/favicon.ico';
+                }else{
+                    img.src = './point.png'; 
+                }
+                //监听加载错误
+                img.onerror = function(event){
+                    event.target.src = './point.png';//错误的改为自备图
+                    // console.log(event);
+                }
+
+
+                button.onclick = function(event){
+                    var button2 = event['target'];//解决编辑输入网址后换图标问题
+                    var img2 = button2.previousSibling;
+                    var key = button2['id'];  
+                    var x = prompt('给我一个网址') 
+                    hash[key] = x  //hash变更,使变更属性消失了
+                    img2.src = 'http://' + x + '/favicon.ico'
+
+                    img2.onerror = function(event){
+                    event.target.src = './point.png';//错误的改为自备图
+                    // console.log(event);
+                }
+
                     localStorage.setItem('zzz', JSON.stringify(hash))//使用localStorage储存，解决属性消失问题
                     console.log(hash)
                 }
-                buttonxxx.textContent = '编辑'
-                div1.appendChild(kbdxxx)
+                button.textContent = '编辑'
+                kbd.appendChild(img)
+                div.appendChild(kbd)
                 index2 = index2 + 1
              }
              
@@ -72,14 +111,21 @@
              index = index + 1
          }
 
+         // 3. 监听键盘
+
          document.onkeypress = function(event){
 
-            key = event['key'] //获取点击事件的字母
-            website = hash[key]
+            var key = event['key'] //按下按键时获取键盘按钮的字符串
+            var website = hash[key] //通过字母获取网站
             console.log(website)
             //location.href = 'http://' + website //获取网页显示在当前页面地址
             window.open('http://' + website, '_blank') //在新窗口打开
 
+         }
+
+         // 封装进函数
+         function getFromLocaStorage(name){
+            return JSON.parse(localStorage.getItem(name) || 'null');
          }
 
          
